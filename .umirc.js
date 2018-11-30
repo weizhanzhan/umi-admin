@@ -1,18 +1,27 @@
 
 // ref: https://umijs.org/config/
+
+const Routes = require('./src/utils/routes')
 export default {
   plugins: [
     // ref: https://umijs.org/plugin/umi-plugin-react.html
     ['umi-plugin-react', {
       antd: true,
       dva: true,
-      dynamicImport: false,
-      title: 'umi-admin',
-      dll: false,
+      dynamicImport: true,
+      title: 'UMI',
+      dll: true,
       routes: {
         exclude: [],
       },
-      hardSource: false,
+      hardSource: true,
+      
     }],
   ],
+  targets:{
+    ie:10
+  },
+  routes:Routes,
+  history:'hash',
+  disableCSSModules:true
 }
