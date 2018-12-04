@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Page-Enter" content="progid:DXImageTransform.Microsoft.Slide(Duration=2)" />
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        body{
+            text-align: center;
+            margin: 0;
+            padding: 0
+        }
+        img{
+            width: 500px;
+        }
+        .test{
+            height: 100vh;
+            width: 100%;
+            background: url('./src/assets/test.jpg');
+            background-size: 100% 100%; 
+        }
+        @media only screen and (max-width: 500px) {
+            img{
+                width: 100%;
+            }
+        }
+        @media only screen
+            and (min-device-width : 768px)
+            and (max-device-width : 1024px)
+            and (orientation : portrait){
+            img{
+                width: 100%;
+            }
+        }
+
+    </style>
+    <div class="test"></div>
+   
+</body>
+
+</html>

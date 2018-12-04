@@ -3,7 +3,8 @@ export default {
     namespace:'user',
     state:{
         token:'',
-        username:''
+        username:'',
+        role:'user'
     },
     effects:{
         *login( {payload ,callback} , {call,put}){

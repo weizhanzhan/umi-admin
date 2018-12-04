@@ -18,3 +18,40 @@
   background: rgba(255,255,255,.2);
   margin: 16px;
 }
+.animation{
+  position: relative;
+  animation-name: rotateSlideIn;
+  animation-duration: 0.5s;
+  animation-timing-function:linear;
+}
+@keyframes moveToLeftFade {
+	from { }
+	to { opacity: 0.3; -webkit-transform: translateX(-100%); transform: translateX(-100%); }
+}
+@keyframes movetoleft {
+  from { -webkit-transform: translateX(100%); }
+}
+@keyframes moveToRight { 
+	from {  -webkit-transform: translateX(-100%);}
+
+}
+@keyframes rotateRightSideFirst {
+	0% { }
+	40% { -webkit-transform: rotateY(15deg); transform: rotateY(15deg); opacity: .8; -webkit-animation-timing-function: ease-out; animation-timing-function: ease-out; }
+	100% { -webkit-transform: scale(0.8) translateZ(-200px); transform: scale(0.8) translateZ(-200px); opacity:0; }
+}
+@keyframes rotateSlideIn {
+  from { opacity: 0; -webkit-transform: translateZ(-500px) rotateY(-90deg); transform: translateZ(-500px) rotateY(-90deg); }
+
+}
+@keyframes rotateSidesOut {
+	from { }
+	to { opacity: 0; -webkit-transform: translateZ(-500px) rotateY(90deg); transform: translateZ(-500px) rotateY(90deg); }
+}
+@keyframes rotateCarouselBottomIn {
+	from { opacity: .3; -webkit-transform: translateY(-200%) scale(.4) rotateX(65deg); transform: translateY(-200%) scale(.4) rotateX(65deg); }
+}
+@keyframes rotateCarouselBottomOut {
+	from { }
+	to { opacity: .3; -webkit-transform: translateY(200%) scale(.4) rotateX(-65deg); transform: translateY(200%) scale(.4) rotateX(-65deg); }
+}

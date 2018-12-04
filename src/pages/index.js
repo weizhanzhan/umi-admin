@@ -1,23 +1,41 @@
 import React, { Component} from 'react'
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu, Icon, message } from 'antd';
 import './index.css'
 import Redirect from 'umi/redirect';
 import Link from 'umi/link';
 import routes from '../utils/routes'
+import Authorized from '../utils/Authorized'
+import hasPermission from '../utils/hasPermission'
+import { getCurrentRoute } from '../utils/AuthRoutes'
 const { Header, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 
 class layoutComponent extends Component {
     state = {
         collapsed: false,
+        openKeys:'',
+        openDoubleKeys:'',
+        class:''
       };
     
     toggle = () => {
+        
         this.setState({
           collapsed: !this.state.collapsed,
         });
+
+        //折叠的时候情况选中菜单  展开回到刚才选中的
+        if(this.state.collapsed){   
+            this.setState({
+                openKeys: this.state.openDoubleKeys?this.state.openDoubleKeys:this.getOpenKeys(),
+            });
+        }else
+            this.clearSubMenu()
+
     }
+
     render(){
+        
         return(
             <Layout>
                 <Sider
@@ -27,52 +45,8 @@ class layoutComponent extends Component {
                     className="home-sider"
                 >
                     <div className="logo" />
-                    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} selectedKeys={[this.getRouteKey()]} defaultOpenKeys={[this.getOpenKeys()]}>
-                        <Menu.Item key="/dashboard">
-                            <Link to='/dashboard' replace>
-                                <Icon type="user" />
-                                <span>dashBoard</span>
-                            </Link>
-                            
-                        </Menu.Item>
-                        <Menu.Item key="/users">
-                            <Link to='/users' replace>
-                                <Icon type="video-camera" />
-                                <span>User</span>
-                            </Link>
-                        </Menu.Item>
-                        <SubMenu key="/setting" title={<span><Icon type="appstore" /><span>Setting</span></span>}>
-                            <Menu.Item key="/setting/user">
-                                <Link to='/setting/user' replace>
-                                    <span>user-setting</span>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item key="/setting/theme">
-                                <Link to='/setting/theme' replace>
-                                    <span>theme-setting</span>
-                                </Link>
-                            </Menu.Item>
-                            {/* <SubMenu key="sub3" title="Submenu">
-                                <Menu.Item key="7">Option 7</Menu.Item>
-                                <Menu.Item key="8">Option 8</Menu.Item>
-                            </SubMenu> */}
-                        </SubMenu>
-                        <SubMenu key="/blog" title={<span><Icon type="appstore" /><span>Blog</span></span>}>
-                            <Menu.Item key="/blog/admin">
-                                <Link to='/blog/admin' replace>
-                                    <span>blog-admin</span>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item key="/blog/classify">
-                                <Link to='/blog/classify' replace>
-                                    <span>blog-classify</span>
-                                </Link>
-                            </Menu.Item>
-                            {/* <SubMenu key="sub3" title="Submenu">
-                                <Menu.Item key="7">Option 7</Menu.Item>
-                                <Menu.Item key="8">Option 8</Menu.Item>
-                            </SubMenu> */}
-                        </SubMenu>
+                    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} selectedKeys={[this.getRouteKey()]} openKeys={[this.state.openKeys?this.state.openKeys:this.getOpenKeys()]} onSelect={this.nowSelect}>
+                        {this.getMenu()}
                     </Menu>
                 </Sider>
                 <Layout>
@@ -83,41 +57,73 @@ class layoutComponent extends Component {
                             onClick={this.toggle}
                         />
                     </Header>
-                    <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-                        { this.auth() }
+                    <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }} className={this.state.class}>                
+                        <Authorized authPath={this.props.location.pathname}>{this.props.children}</Authorized>
                     </Content>
                 </Layout>
             </Layout>
         )
     }
-    auth(){
-        const state = window.g_app._store.getState().user
-        if(state.token||localStorage.token){
-            return this.props.children
-        }else {
-            return <Redirect to="/login" />
-        }
+    nowSelect=({ item, key, selectedKeys })=>{   //当选择的是一级菜单的时候 关闭其他打开的submenu
+        if(key.split('/').length>2)
+            return
+        this.clearSubMenu()   
     }
-    getRouteKey(){
+    //路由菜单-----------------------------------------------------------------------------
+    getRouteKey(){//根据路径名称得到选中的菜单
         return this.props.location.pathname
     }
-    getOpenKeys(){
-        console.log(routes)
-        return this.getKeys(routes)[0]?this.getKeys(routes)[0].fatherKey:''
-
+    getOpenKeys(){//第一次进来 根据地址栏 获取默认选中菜单
+        let route = getCurrentRoute(routes,this.props.location.pathname)[0]//获取当前路由地址下的对应路由表的信息
+        return route?route.fatherKey:''
     }
-    getKeys(arr){
-        let path = this.props.location.pathname
-        let name=[]
-        arr.forEach(a=>{
-           if(a.path==path){
-                name.push(a)
-           }
-           if(a.routes){
-                name.push(...this.getKeys(a.routes))
-           }
+    openSubMenu=({ key, domEvent })=>{//当前打开的submenu 关闭其他展开的
+        if(key!==(this.state.openKeys?this.state.openKeys:this.getOpenKeys())){
+            this.setState({
+                openKeys:key,
+                openDoubleKeys:key
+            })
+            return
+        }
+        this.clearSubMenu()
+    }
+    clearSubMenu=()=>{
+        this.setState({
+            openKeys:'null',
+        }) 
+    }
+
+    //动态菜单--------------------------------------------------------------------
+    getMenu(){
+        let r = routes[1].routes
+        return this.getMenuList(r)
+    }
+    getMenuList(menus){
+        let vnode=[]
+        menus.forEach(menu=>{
+            if(hasPermission(menu)){
+                if(!menu.routes&&menu.path&&menu.name){
+                        vnode.push (
+                            <Menu.Item key={menu.path}>
+                                <Link to={menu.path} replace>
+                                    <Icon type={menu.icon} />
+                                    <span>{menu.name}</span>
+                                </Link>         
+                            </Menu.Item>
+                        )         
+                }
+                else if(menu.routes){
+                
+                        vnode.push(
+                            <SubMenu key={menu.path} onTitleClick={this.openSubMenu} title={<span><Icon type={menu.icon} /><span>{menu.name}</span></span>}>
+                                {this.getMenuList(menu.routes)}
+                            </SubMenu>
+                        )
+                    }
+                }
+            
         })
-        return name
+        return vnode
     }
 }
 
