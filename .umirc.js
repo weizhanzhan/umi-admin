@@ -22,6 +22,6 @@ export default {
     ie:10
   },
   routes:Routes,
-  history:'hash',
+  // history:'hash',
   disableCSSModules:true
 }

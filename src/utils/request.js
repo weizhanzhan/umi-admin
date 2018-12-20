@@ -42,12 +42,9 @@ const service = axios.create({
  * 添加请求拦截器
  */
 service.interceptors.request.use(config =>{
-   // config.headers['Authorization'] = "Bearer "+getToken();
-   // config.headers['Abp.TenantId'] = getTenantId()
-    // config.header('Access-Control-Allow-')
-    // if(config.method=="get"){
-    //     config.url = config.url + '?t='+new Date().getTime();
-    // }
+    if (localStorage.token) {  // 每次发送请求之前判断是否存在token，如果存在，则统一在http请求的header都加上token，不用每次请求都手动添加了
+        config.headers['Authorization'] = localStorage.token
+    }
     return config
 },error => {
     console.log(error)

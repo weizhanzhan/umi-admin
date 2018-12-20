@@ -1,6 +1,13 @@
 .home-sider{
   height: 100vh;
 }
+.home-header{
+ 
+}
+.user-info-menu{
+  position: absolute;
+  right: 30px;
+}
 .home-header .trigger {
   font-size: 18px;
   line-height: 64px;

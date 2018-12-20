@@ -8,3 +8,12 @@ export async function userLogin(params) {
     }
     });
 }
+
+//获取个人信息
+export const getUserInfo = () => {
+    return request({
+        url:'/current',///blog
+        method:'get',
+    })
+
+}

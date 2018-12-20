@@ -1,11 +1,17 @@
 import React, { Component} from 'react'
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
-
+import './index.css'
 import router from 'umi/router'
 const FormItem = Form.Item;
 class Login extends Component {
+    state={
+        loading:false
+    }
     handleSubmit = (e) => {
         e.preventDefault();
+        this.setState({
+            loading:true
+        })
         this.props.form.validateFields((err, values) => {
           if (!err) {
             window.g_app._store.dispatch({
@@ -23,7 +29,11 @@ class Login extends Component {
         const { getFieldDecorator } = this.props.form;
         return(
             <div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>
+                {/* <div className="example">
+                    <Spin />
+                </div> */}
                 <div style={{height:'500px',width:'350px',border:'1px solid #EEEEEE'}}>
+                
                 <Form onSubmit={this.handleSubmit} style={{maxWidth: '300px',margin:'0 auto',marginTop:'100px'}}>
                     <FormItem>
                     {getFieldDecorator('userName', {
@@ -47,7 +57,7 @@ class Login extends Component {
                         <Checkbox>Remember me</Checkbox>
                     )}
                     <a style={{float:'right'}} href="">Forgot password</a>
-                    <Button type="primary" htmlType="submit" style={{width:'100%'}}>
+                    <Button type="primary" htmlType="submit" style={{width:'100%'}} loading={this.state.loading}>
                         Log in
                     </Button>
                     Or <a href="">register now!</a>

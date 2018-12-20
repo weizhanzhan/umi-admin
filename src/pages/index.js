@@ -1,7 +1,6 @@
 import React, { Component} from 'react'
-import { Layout, Menu, Icon, message } from 'antd';
+import { Layout, Menu, Icon, Avatar } from 'antd';
 import './index.css'
-import Redirect from 'umi/redirect';
 import Link from 'umi/link';
 import routes from '../utils/routes'
 import Authorized from '../utils/Authorized'
@@ -15,27 +14,21 @@ class layoutComponent extends Component {
         collapsed: false,
         openKeys:'',
         openDoubleKeys:'',
-        class:''
-      };
-    
+      };  
     toggle = () => {
-        
         this.setState({
           collapsed: !this.state.collapsed,
         });
-
-        //折叠的时候情况选中菜单  展开回到刚才选中的
+        //折叠的时候清空选中菜单  展开回到刚才选中的
         if(this.state.collapsed){   
             this.setState({
                 openKeys: this.state.openDoubleKeys?this.state.openDoubleKeys:this.getOpenKeys(),
             });
         }else
             this.clearSubMenu()
-
     }
-
     render(){
-        
+      
         return(
             <Layout>
                 <Sider
@@ -56,10 +49,13 @@ class layoutComponent extends Component {
                             type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                             onClick={this.toggle}
                         />
+                        {this.getUserMenu()}
                     </Header>
-                    <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }} className={this.state.class}>                
+                    
+                    <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }} className={this.state.class}>                          
                         <Authorized authPath={this.props.location.pathname}>{this.props.children}</Authorized>
                     </Content>
+                    
                 </Layout>
             </Layout>
         )
@@ -78,7 +74,8 @@ class layoutComponent extends Component {
         return route?route.fatherKey:''
     }
     openSubMenu=({ key, domEvent })=>{//当前打开的submenu 关闭其他展开的
-        if(key!==(this.state.openKeys?this.state.openKeys:this.getOpenKeys())){
+        let openkey = this.state.openKeys
+        if(key!==(openkey?openkey:this.getOpenKeys())){
             this.setState({
                 openKeys:key,
                 openDoubleKeys:key
@@ -92,7 +89,6 @@ class layoutComponent extends Component {
             openKeys:'null',
         }) 
     }
-
     //动态菜单--------------------------------------------------------------------
     getMenu(){
         let r = routes[1].routes
@@ -103,27 +99,35 @@ class layoutComponent extends Component {
         menus.forEach(menu=>{
             if(hasPermission(menu)){
                 if(!menu.routes&&menu.path&&menu.name){
-                        vnode.push (
-                            <Menu.Item key={menu.path}>
-                                <Link to={menu.path} replace>
-                                    <Icon type={menu.icon} />
-                                    <span>{menu.name}</span>
-                                </Link>         
-                            </Menu.Item>
-                        )         
+                    vnode.push (
+                        <Menu.Item key={menu.path}>
+                            <Link to={menu.path} replace>
+                                <Icon type={menu.icon} />
+                                <span>{menu.name}</span>
+                            </Link>         
+                        </Menu.Item>
+                    )         
                 }
-                else if(menu.routes){
-                
-                        vnode.push(
-                            <SubMenu key={menu.path} onTitleClick={this.openSubMenu} title={<span><Icon type={menu.icon} /><span>{menu.name}</span></span>}>
-                                {this.getMenuList(menu.routes)}
-                            </SubMenu>
-                        )
-                    }
+                else if(menu.routes){   
+                    vnode.push(
+                        <SubMenu key={menu.path} onTitleClick={this.openSubMenu} title={<span><Icon type={menu.icon} /><span>{menu.name}</span></span>}>
+                            {this.getMenuList(menu.routes)}
+                        </SubMenu>
+                    )
                 }
-            
+            }   
         })
         return vnode
+    }
+    getUserMenu = () =>{
+        const state = window.g_app._store.getState()
+        console.log(state)
+        return (
+            <span className='user-info-menu'>
+                <Avatar size={32} src={state.user.avatar} />
+                <span className=''>weizhan</span>
+            </span>
+        )
     }
 }
 
